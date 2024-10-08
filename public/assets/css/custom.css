@@ -1,0 +1,36 @@
+.codefotech_color {
+	color: #fff !important;
+	border: 1px solid #1e81bb !important;
+	background: #1e81bb !important;
+}
+
+.codefotech_text_color {
+	color: #1e81bb !important;
+}
+
+
+.btn-outline-codefotech {
+	color: #1e81bb !important;
+	border-color: #1e81bb !important;
+}
+
+.btn-outline-codefotech:hover {
+	color: #fff !important;
+	background-color: #1e81bb !important;
+	border-color: #1e81bb !important;
+}
+
+.select2-selection.select2-selection--single .select2-selection__arrow {
+    height: 35px !important;
+    width: 30px !important;
+
+}
+
+.select2-selection.select2-selection--single {
+    height: 40px !important;
+    padding: 5px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #697a8d !important;
+}
