@@ -15,7 +15,7 @@
                             <!-- <img src="assets-2/img/logo.png" alt="">
                             <span>FlexStart</span> -->
                 
-                            <img src="{{ asset('assets-2/img/CodeFoTech-1.png') }}" style="max-height: 40px" alt="Codefotech">
+                            <img src="{{ asset('assets/images/bdcalling_logo.png') }}" style="max-height: 40px" alt="Bdcalling">
                         </a>
                     </div>
                     <!-- /Logo -->

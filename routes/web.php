@@ -1,39 +1,36 @@
 <?php
 
+use App\Modules\Dashboard\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
+use Rap2hpoutre\LaravelLogViewer\LogViewerController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('verify_login.otp');
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/login', [AuthController::class, 'login'])->name('login');
+Route::post('login-check', [AuthController::class, 'loginCheck'])->name('login.check'); // Removed middleware
 
+Route::get('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/register/store', [AuthController::class, 'store'])->name('register.store');
 
-Route::get( '/login', [AuthController::class, 'login'] )->name( 'login' );
-Route::post( 'login-check', array( AuthController::class, 'loginCheck' ) )->name( 'login.check' );
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-Route::get( '/register', [AuthController::class, 'register'] )->name( 'register' );
-Route::post( '/register/store', [AuthController::class, 'store'] )->name( 'register.store' );
+Route::get('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot-password');
+Route::post('/forgot-password/create', [AuthController::class, 'forgotPasswordAction'])->name('forgot-password.create');
 
+Route::middleware(['verify_reset.otp'])->group(function () {
+    Route::get('/reset-password/{token}', [AuthController::class, 'resetPassword'])->name('reset-password');
+    Route::post('/reset-password', [AuthController::class, 'resetPasswordAction'])->name('reset-password.action');
+});
 
-Route::get( '/logout', [AuthController::class, 'logout'] )->name( 'logout' )->middleware('auth');
+Route::get('/two-steps/login', [AuthController::class, 'twoStepsLogin'])
+    ->name('two-steps.login')
+    ->middleware('verify_login.otp');
+Route::get('/two-steps/reset-password', [AuthController::class, 'twoStepsResetPassword'])->name('two-steps.reset-password')->middleware('verify_reset.otp');
 
+Route::post('/verify_login-otp', [AuthController::class, 'verifyLoginOtpAction'])
+    ->name('verify-login.otp.action');
+Route::post('/verify_reset-otp', [AuthController::class, 'verifyResetOtpAction'])->name('verify-reset.otp.action');
 
-//Route::get('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot-password');
-//Route::post('/forgot-password/create', [AuthController::class, 'forgotPasswordAction'])->name('forgot-password.create');
-//
-//Route::get('/reset-password/{token}', [AuthController::class, 'resetPassword'])->name('reset-password');
-//Route::post('/reset-password', [AuthController::class, 'resetPasswordAction'])->name('forgot-password.update');
+Route::get('logs', [LogViewerController::class, 'index']);
 
-//Route::get( '/verify-email', [AuthController::class, 'verifyEmail'] )->name( 'verify-email' );
-//Route::get( '/two-steps', [AuthController::class, 'twoSteps'] )->name( 'two-steps' );

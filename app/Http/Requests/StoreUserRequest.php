@@ -27,6 +27,7 @@ class StoreUserRequest extends FormRequest
         $rules['name'] = 'required|string|max:255';
         $rules['email'] = 'required|email|unique:users,email,' . $userId;
         $rules['password'] = 'required|min:8';
+        $rules['role'] = 'required';
 
         if ( $this->request->get( 'id' ) ) {
             $id = $this->request->get('id');
@@ -56,7 +57,7 @@ class StoreUserRequest extends FormRequest
             'email.unique' => 'This email has already been taken',
             'password.required' => 'Password is required',
             'password.min' => 'Password must be at least 8 characters',
-            'user_type.required' => 'The organization list field is required.',
+            'role.required' => 'The role field is required.',
         ]);
     }
 }

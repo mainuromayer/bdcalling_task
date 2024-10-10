@@ -45,6 +45,8 @@ class Kernel extends HttpKernel
         ],
     ];
 
+
+
     /**
      * The application's middleware aliases.
      *
@@ -63,5 +65,7 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'verify_login.otp' => \App\Http\Middleware\VerifyLoginOtp::class,
+        'verify_reset.otp' => \App\Http\Middleware\VerifyResetOtp::class,
     ];
 }

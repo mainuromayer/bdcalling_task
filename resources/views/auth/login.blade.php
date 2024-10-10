@@ -16,7 +16,7 @@
                             <!-- <img src="assets-2/img/logo.png" alt="">
                             <span>FlexStart</span> -->
 
-                            <img src="{{ asset('assets-2/img/CodeFoTech-1.png') }}" style="max-height: 40px" alt="Codefotech">
+                            <img src="{{ asset('assets/images/bdcalling_logo.png') }}" style="max-height: 40px" alt="Bdcalling">
                         </a>
                     </div>
                     <!-- /Logo -->
@@ -87,24 +87,24 @@
                             </a>
                         </p>
 
-                        <div class="divider my-4">
+                        {{-- <div class="divider my-4">
                             <div class="divider-text">or</div>
                         </div>
 
                         <div class="d-flex justify-content-center gap-2">
-                            <a href="https://www.facebook.com/profile.php?id=61558796675458" target="_blank" class="btn btn-icon btn-lg rounded-pill btn-text-facebook">
+                            <a href="#" target="_blank" class="btn btn-icon btn-lg rounded-pill btn-text-facebook">
                                 <i class="tf-icons mdi mdi-24px mdi-facebook"></i>
                             </a>
 
-                            <a href="https://www.linkedin.com/company/codefotech/" target="_blank" class="btn btn-icon btn-lg rounded-pill btn-text-linkedin">
+                            <a href="#" target="_blank" class="btn btn-icon btn-lg rounded-pill btn-text-linkedin">
                                 <i class="tf-icons mdi mdi-24px mdi-linkedin"></i>
                             </a>
 
-                            <a href="https://github.com/codefotech/" target="_blank" class="btn btn-icon btn-lg rounded-pill btn-text-github">
+                            <a href="#" target="_blank" class="btn btn-icon btn-lg rounded-pill btn-text-github">
                                 <i class="tf-icons mdi mdi-24px mdi-github"></i>
                             </a>
 
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
                 <!-- /Login -->
