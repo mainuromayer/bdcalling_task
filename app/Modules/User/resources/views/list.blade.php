@@ -83,11 +83,46 @@
                     },
                     {
                         data: 'action',
-                        name: 'action'
+                        name: 'action',
+                        render: function (data, type, row) {
+                            return `
+                            <a href="/user/edit/${row.id}" class="btn btn-sm btn-outline-dark">
+                                <i class="fa fa-edit"></i> Edit
+                            </a>
+                            <button class="btn btn-sm btn-danger delete-user" data-id="${row.id}">
+                                <i class="fa fa-trash"></i> Delete
+                            </button>`;
+                        }
                     }
                 ],
                 "aaSorting": []
             });
+
+            // Delete user function
+            $(document).on('click', '.delete-user', function() {
+                const id = $(this).data('id');
+                if(confirm('Are you sure you want to delete this user?')) {
+                    $.ajax({
+                        url: `/user/delete/${id}`,
+                        method: 'DELETE',
+                        data: {
+                            _token: $('input[name="_token"]').val()
+                        },
+                        success: function(response) {
+                            if(response.success) {
+                                $('#list').DataTable().ajax.reload(); // Reload datatable after deletion
+                                alert('User deleted successfully.');
+                            } else {
+                                alert('Something went wrong.');
+                            }
+                        },
+                        error: function(error) {
+                            alert('Error deleting user.');
+                        }
+                    });
+                }
+            });
         });
     </script>
+
 @endsection

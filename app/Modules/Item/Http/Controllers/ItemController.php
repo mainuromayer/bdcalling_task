@@ -100,4 +100,17 @@ class ItemController extends Controller
         }
     }
 
+    public function destroy($id)
+    {
+        try {
+            $item = Item::findOrFail($id);
+            $item->delete();
+
+            return response()->json(['success' => true, 'message' => 'Item deleted successfully.']);
+        } catch (Exception $e) {
+            Log::error("Error in ItemController@destroy ({$e->getFile()}:{$e->getLine()}): {$e->getMessage()}");
+            return response()->json(['success' => false, 'message' => 'Something went wrong.']);
+        }
+    }
+
 }

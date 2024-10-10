@@ -66,10 +66,6 @@
                         </div>
 
                         {!! Form::button('Verify my account', ['type' => 'submit', 'class' => 'btn btn-primary d-grid w-100 mb-3']) !!}
-                        <div class="text-center">
-                            Didn't get the code?
-                            <a href="javascript:void(0);">Resend</a>
-                        </div>
 
                     </div>
                 </div>

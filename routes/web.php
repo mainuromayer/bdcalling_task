@@ -32,5 +32,8 @@ Route::post('/verify_login-otp', [AuthController::class, 'verifyLoginOtpAction']
     ->name('verify-login.otp.action');
 Route::post('/verify_reset-otp', [AuthController::class, 'verifyResetOtpAction'])->name('verify-reset.otp.action');
 
+
+
+
 Route::get('logs', [LogViewerController::class, 'index']);
 

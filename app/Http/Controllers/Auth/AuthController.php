@@ -37,7 +37,6 @@ class AuthController extends Controller
             if (Auth::attempt($request->only('email', 'password'))) {
                 $user = Auth::user(); // Now user is authenticated
 
-                // Debugging log
                 Log::info("User authenticated: {$user->email}");
 
                 // Generate OTP
@@ -46,14 +45,10 @@ class AuthController extends Controller
                 Session::put('otp', $otp);
                 Session::put('otp_verified', false); // Ensure OTP is not verified yet
 
-                // Send OTP to the user's email
                 Mail::to($user->email)->send(new OtpMail($otp));
-
-                // Redirect to the OTP verification page
                 return redirect()->route('two-steps.login')->with('status', 'OTP sent to your email. Please verify your OTP.');
             }
 
-            // Log invalid credentials
             Log::warning("Invalid credentials for email: {$request->email}");
             return back()->withErrors(['email' => 'Invalid credentials.']);
         } catch (Exception $e) {
@@ -61,6 +56,7 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'An error occurred.']);
         }
     }
+
 
     public function register(): View
     {
@@ -109,6 +105,18 @@ class AuthController extends Controller
         return back()->withErrors(['otp' => 'Invalid OTP']);
     }
 
+    public function verifyResetOtpAction(Request $request): RedirectResponse
+    {
+        $request->validate(['otp' => 'required|numeric']);
+
+        if ($this->isValidOtp($request->otp)) {
+            Session::put('otp_verified', true); // Set OTP as verified
+            return redirect()->route('dashboard');
+        }
+
+        return back()->withErrors(['otp' => 'Invalid OTP']);
+    }
+
 
 
     public function forgotPassword(): View
@@ -119,15 +127,12 @@ class AuthController extends Controller
     public function forgotPasswordAction(Request $request)
     {
         $request->validate(['email' => 'required|email']);
-
         $user = User::where('email', $request->email)->first();
 
         if ($user) {
             $otp = rand(100000, 999999);
             session(['otp' => $otp, 'otp_email' => $request->email]);
-
             Mail::to($request->email)->send(new OtpMail($otp));
-
             return redirect()->route('two-steps.reset-password')->with('status', 'OTP sent to your email.');
         }
 
@@ -167,6 +172,8 @@ class AuthController extends Controller
 
         return back()->withErrors(['email' => 'Failed to reset password.']);
     }
+
+
 
     private function isValidOtp($otp)
     {

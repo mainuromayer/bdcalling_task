@@ -108,4 +108,18 @@ class UserController {
         }
     }
 
+    public function destroy($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
+
+            return response()->json(['success' => true, 'message' => 'User deleted successfully!']);
+        } catch (Exception $e) {
+            Log::error("Error occurred in UserController@destroy ({$e->getFile()}:{$e->getLine()}): {$e->getMessage()}");
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }

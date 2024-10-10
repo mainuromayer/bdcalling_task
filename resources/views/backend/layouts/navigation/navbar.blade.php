@@ -79,13 +79,13 @@
                         <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="{{ route('profile') }}">
+                        <a class="dropdown-item" href="javascript:void(0);">
                             <i class="mdi mdi-account-outline me-2"></i>
                             <span class="align-middle">My Profile</span>
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="javascript:;">
+                        <a class="dropdown-item" href="javascript:void(0);">
                             <i class="mdi mdi-cog-outline me-2"></i>
                             <span class="align-middle">Settings</span>
                         </a>
