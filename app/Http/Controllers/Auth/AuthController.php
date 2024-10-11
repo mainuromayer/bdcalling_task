@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helper\JWTToken;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Mail\OtpMail;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -28,25 +30,35 @@ class AuthController extends Controller
 
     public function loginCheck(Request $request)
     {
+        // Validate input fields
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
         try {
+            // Attempt login using the provided credentials
             if (Auth::attempt($request->only('email', 'password'))) {
-                $user = Auth::user(); // Now user is authenticated
-
+                $user = Auth::user(); // Authenticated user
                 Log::info("User authenticated: {$user->email}");
 
-                // Generate OTP
+                // Generate JWT token using Tymon JWTAuth package
+                $jwtToken = JWTAuth::fromUser($user);
+
+                // Generate OTP and store in session
                 $otp = rand(100000, 999999);
                 Session::put('otp_email', $user->email);
                 Session::put('otp', $otp);
-                Session::put('otp_verified', false); // Ensure OTP is not verified yet
+                Session::put('otp_verified', false); // Mark OTP as not yet verified
 
+                // Send OTP via email
                 Mail::to($user->email)->send(new OtpMail($otp));
-                return redirect()->route('two-steps.login')->with('status', 'OTP sent to your email. Please verify your OTP.');
+
+                // Set the JWT token as an HTTP-only cookie (to prevent JavaScript access)
+                return redirect()
+                    ->route('two-steps.login')
+                    ->with('status', 'OTP sent to your email. Please verify your OTP.')
+                    ->cookie('jwt_token', $jwtToken, 60); // Expires in 60 minutes
             }
 
             Log::warning("Invalid credentials for email: {$request->email}");
@@ -56,6 +68,8 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'An error occurred.']);
         }
     }
+
+
 
 
     public function register(): View
@@ -159,18 +173,20 @@ class AuthController extends Controller
             'token' => 'required',
         ]);
 
-        $status = Password::reset($request->only('email', 'password', 'token'), function ($user) use ($request) {
-            $user->forceFill([
-                'password' => Hash::make($request->password),
-                'remember_token' => Str::random(60),
-            ])->save();
-        });
+        // Generate a token for password reset (for 20 minutes)
+        $token = JWTToken::CreateTokenForSetPassword($request->email);
 
-        if ($status === Password::PASSWORD_RESET) {
+        // Process password reset logic
+        try {
+            $user = User::where('email', $request->email)->firstOrFail();
+            $user->password = Hash::make($request->password);
+            $user->save();
+
             return redirect()->route('login')->with('status', 'Password reset successful.');
+        } catch (Exception $e) {
+            Log::error("Error in AuthController@resetPasswordAction: {$e->getMessage()}");
+            return back()->withErrors(['error' => 'Failed to reset password.']);
         }
-
-        return back()->withErrors(['email' => 'Failed to reset password.']);
     }
 
 
