@@ -122,26 +122,26 @@ class AuthController extends Controller
 
 
 
-//    public function resetPasswordAction(Request $request)
-//    {
-//        $request->validate([
-//            'email' => 'required|email',
-//            'password' => 'required|string|min:8|confirmed',
-//            'token' => 'required',
-//        ]);
-//
-//        // Process password reset logic
-//        try {
-//            $user = User::where('email', $request->email)->firstOrFail();
-//            $user->password = Hash::make($request->password);
-//            $user->save();
-//
-//            return redirect()->route('login')->with('status', 'Password reset successful.');
-//        } catch (Exception $e) {
-//            Log::error("Error in AuthController@resetPasswordAction: {$e->getMessage()}");
-//            return back()->withErrors(['error' => 'Failed to reset password.']);
-//        }
-//    }
+    public function resetPasswordAction(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string|min:8|confirmed',
+            'token' => 'required',
+        ]);
+
+        // Process password reset logic
+        try {
+            $user = User::where('email', $request->email)->firstOrFail();
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            return redirect()->route('login')->with('status', 'Password reset successful.');
+        } catch (Exception $e) {
+            Log::error("Error in AuthController@resetPasswordAction: {$e->getMessage()}");
+            return back()->withErrors(['error' => 'Failed to reset password.']);
+        }
+    }
 
 
     public function forgotPassword(): View
