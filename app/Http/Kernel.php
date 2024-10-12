@@ -67,5 +67,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'verify_login.otp' => \App\Http\Middleware\VerifyLoginOtp::class,
         'verify_reset.otp' => \App\Http\Middleware\VerifyResetOtp::class,
+        'auth:api' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
     ];
 }

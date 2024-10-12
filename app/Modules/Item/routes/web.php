@@ -1,9 +1,10 @@
 <?php
 
+use App\Modules\Item\Http\Controllers\ItemApiController;
 use App\Modules\Item\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['Module' => 'Item', 'middleware' => 'auth'], function () {
+Route::group(['Module' => 'Item', 'middleware' => 'verify_login.otp'], function () {
     Route::prefix('item')->group(function () {
         Route::match(['get', 'post'], '/', [ItemController::class, 'list'])->name('item.list');
         Route::get('create', [ItemController::class, 'create'])->name('item.create');

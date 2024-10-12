@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(
     [
         'Module' => 'Dashboard',
-        'middleware' => ['web', 'auth']
+        'middleware' => ['web', 'verify_login.otp']
     ],
     function () {
         Route::prefix('dashboard')->group(function () {

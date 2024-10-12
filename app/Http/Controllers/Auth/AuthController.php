@@ -30,45 +30,41 @@ class AuthController extends Controller
 
     public function loginCheck(Request $request)
     {
-        // Validate input fields
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
         try {
-            // Attempt login using the provided credentials
+            // Attempt to authenticate the user
             if (Auth::attempt($request->only('email', 'password'))) {
-                $user = Auth::user(); // Authenticated user
-                Log::info("User authenticated: {$user->email}");
+                $user = Auth::user();
 
-                // Generate JWT token using Tymon JWTAuth package
+                // Generate JWT token for the authenticated user
                 $jwtToken = JWTAuth::fromUser($user);
-
-                // Generate OTP and store in session
                 $otp = rand(100000, 999999);
                 Session::put('otp_email', $user->email);
                 Session::put('otp', $otp);
-                Session::put('otp_verified', false); // Mark OTP as not yet verified
+                Session::put('otp_verified', false);
 
-                // Send OTP via email
+                // Send OTP to user's email
                 Mail::to($user->email)->send(new OtpMail($otp));
 
-                // Set the JWT token as an HTTP-only cookie (to prevent JavaScript access)
+                // Store the JWT token in a cookie and redirect to OTP verification page
                 return redirect()
                     ->route('two-steps.login')
                     ->with('status', 'OTP sent to your email. Please verify your OTP.')
-                    ->cookie('jwt_token', $jwtToken, 60); // Expires in 60 minutes
+                    ->cookie('jwt_token', $jwtToken, 60); // JWT expires in 60 minutes
             }
 
-            Log::warning("Invalid credentials for email: {$request->email}");
+            // Invalid credentials response
             return back()->withErrors(['email' => 'Invalid credentials.']);
         } catch (Exception $e) {
+            // Log any exceptions
             Log::error("Error in AuthController@loginCheck: {$e->getMessage()}");
             return back()->withErrors(['email' => 'An error occurred.']);
         }
     }
-
 
 
 
@@ -111,26 +107,41 @@ class AuthController extends Controller
     {
         $request->validate(['otp' => 'required|numeric']);
 
+        if (!Auth::check()) {
+            return redirect()->route('login')->withErrors(['error' => 'You need to be logged in to verify OTP.']);
+        }
+
+        // Validate the OTP
         if ($this->isValidOtp($request->otp)) {
-            Session::put('otp_verified', true); // Set OTP as verified
+            session(['otp_verified' => true]);
             return redirect()->route('dashboard');
         }
 
         return back()->withErrors(['otp' => 'Invalid OTP']);
     }
 
-    public function verifyResetOtpAction(Request $request): RedirectResponse
-    {
-        $request->validate(['otp' => 'required|numeric']);
 
-        if ($this->isValidOtp($request->otp)) {
-            Session::put('otp_verified', true); // Set OTP as verified
-            return redirect()->route('dashboard');
-        }
 
-        return back()->withErrors(['otp' => 'Invalid OTP']);
-    }
-
+//    public function resetPasswordAction(Request $request)
+//    {
+//        $request->validate([
+//            'email' => 'required|email',
+//            'password' => 'required|string|min:8|confirmed',
+//            'token' => 'required',
+//        ]);
+//
+//        // Process password reset logic
+//        try {
+//            $user = User::where('email', $request->email)->firstOrFail();
+//            $user->password = Hash::make($request->password);
+//            $user->save();
+//
+//            return redirect()->route('login')->with('status', 'Password reset successful.');
+//        } catch (Exception $e) {
+//            Log::error("Error in AuthController@resetPasswordAction: {$e->getMessage()}");
+//            return back()->withErrors(['error' => 'Failed to reset password.']);
+//        }
+//    }
 
 
     public function forgotPassword(): View

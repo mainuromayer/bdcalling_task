@@ -11,7 +11,6 @@ class JWTToken
     public static function CreateToken($user)
     {
         try {
-            // Create a token for the authenticated user
             return JWTAuth::fromUser($user);
         } catch (JWTException $e) {
             return response()->json(['error' => 'Could not create token'], 500);
@@ -21,13 +20,12 @@ class JWTToken
     public static function CreateTokenForSetPassword($userEmail)
     {
         try {
-            // Create a custom payload for resetting the password
             $customClaims = [
                 'email' => $userEmail,
-                'exp' => now()->addMinutes(20)->timestamp, // Token expiration time (20 mins)
+                'exp' => now()->addMinutes(20)->timestamp,
             ];
 
-            return JWTAuth::customClaims($customClaims)->tokenById(0); // Setting userID to 0 for password reset
+            return JWTAuth::customClaims($customClaims)->tokenById(0);
         } catch (JWTException $e) {
             return response()->json(['error' => 'Could not create token'], 500);
         }
@@ -36,7 +34,6 @@ class JWTToken
     public static function VerifyToken($token)
     {
         try {
-            // Decode and validate the token
             $decoded = JWTAuth::setToken($token)->authenticate();
             return $decoded;
         } catch (JWTException $e) {

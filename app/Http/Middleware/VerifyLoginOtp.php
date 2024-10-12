@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Helper\JWTToken;
@@ -13,29 +14,25 @@ class VerifyLoginOtp
 {
     public function handle(Request $request, Closure $next)
     {
-        $token = $request->cookie('jwt_token');
+        $token = $request->bearerToken() ?? $request->cookie('jwt_token');
 
-        if ($token) {
-            $decoded = JWTToken::VerifyToken($token);
-            if (!$decoded) {
-                return redirect()->route('login')->withErrors(['error' => 'Unauthorized']);
+        if (!$token) {
+            return response()->json(['error' => 'Token not provided.'], 401);
+        }
+
+        try {
+            $decoded = JWTAuth::setToken($token)->getPayload();
+            $userId = $decoded->get('sub');
+
+            $user = User::find($userId);
+            if (!$user) {
+                return response()->json(['error' => 'User not found.'], 404);
             }
 
-            $user = User::find($decoded->id);
-            if ($user) {
-                Auth::login($user);
-            } else {
-                return redirect()->route('login')->withErrors(['error' => 'User not found.']);
-            }
-        } else {
-            if (!Auth::check()) {
-                return redirect()->route('login');
-            }
-            if (!session('otp_verified')) {
-                if (!$request->routeIs('two-steps.login') && !$request->routeIs('verify-login.otp.action')) {
-                    return redirect()->route('two-steps.login')->withErrors(['otp' => 'You must verify your OTP first to log in.']);
-                }
-            }
+            Auth::login($user);
+
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Token is invalid or expired.'], 401);
         }
 
         return $next($request);

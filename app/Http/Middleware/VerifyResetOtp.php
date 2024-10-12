@@ -11,10 +11,11 @@ class VerifyResetOtp
 {
     public function handle($request, Closure $next)
     {
-        if (!Auth::check() || !session('otp_verified')) {
-            return redirect()->route('two-steps.reset-password')->withErrors(['otp' => 'Please verify your OTP first.']);
+        if (!session('otp_verified')) {
+            return redirect()->route('two-steps.reset-password')->withErrors(['otp' => 'Please verify your OTP.']);
         }
 
         return $next($request);
     }
+
 }
